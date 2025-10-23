@@ -1,0 +1,95 @@
+{
+  "header": {
+    "my_hub": "My Hub",
+    "home": "Home",
+    "success_stories": "Success Stories",
+    "events": "Events",
+    "courses": "Courses",
+    "logout": "Logout",
+    "login": "Alumni Login",
+    "welcome": "Welcome, {{name}}"
+  },
+  "footer": {
+    "empowering_message": "Empowering our alumni for a brighter future.",
+    "navigate_heading": "Navigate",
+    "alumni_heading": "Alumni",
+    "copyright": "© 2025 Tata STRIVE Organization. All rights reserved."
+  },
+  "register": {
+    "title": "Join the Alumni Network",
+    "org_for": "for {{name}}",
+    "full_name": "Full Name",
+    "mobile_number": "Mobile Number",
+    "email": "Email Address",
+    "submit_button": "Register for Approval",
+    "loading_button": "Submitting...",
+    "success_title": "Registration Submitted!",
+    "success_message": "Thank you for registering. An admin will review your submission for approval shortly.",
+    "back_to_login": "Back to Login",
+    "not_member": "Not a member yet?",
+    "register_now": "Register Now"
+  },
+  "login": {
+    "welcome": "Welcome Back, Alumni!",
+    "mobile_number": "Registered Mobile Number",
+    "get_otp": "Get OTP",
+    "sending_otp": "Sending...",
+    "otp_sent": "Enter the 6-digit OTP sent to {{mobileNumber}}",
+    "otp_label": "One-Time Password",
+    "verify_login": "Verify & Login",
+    "verifying": "Verifying...",
+    "back_to_login": "Back to Login"
+  },
+  "alumni_dashboard": {
+    "welcome_title": "Welcome back, {{name}}!",
+    "welcome_subtitle": "Your journey continues here. Find opportunities, connect with peers, and keep growing.",
+    "jobs_title": "Job Opportunities",
+    "post_job": "+ Post a Job",
+    "apply_now": "Apply Now",
+    "no_jobs": "No job opportunities available.",
+    "upskilling_title": "Upskilling Courses",
+    "enroll_now": "Enroll Now",
+    "no_upskilling": "No upskilling courses available.",
+    "profile_title": "My Profile",
+    "view_profile": "View My Profile",
+    "connections_title": "My Connections",
+    "pending_requests": "You have {{count}} pending request.",
+    "pending_requests_plural": "You have {{count}} pending requests.",
+    "manage_connections": "Manage Connections"
+  },
+  "toasts": {
+    "apply_job_loading": "Applying for job...",
+    "apply_job_success": "Successfully applied for the job!",
+    "apply_job_error": "Failed to apply for job.",
+    "enroll_course_loading": "Enrolling in course...",
+    "enroll_course_success": "Successfully enrolled in the course!",
+    "enroll_course_error": "Failed to enroll in course.",
+    "submit_job_loading": "Submitting job...",
+    "submit_job_success": "Job submitted for verification!",
+    "submit_job_error": "Failed to submit job."
+  },
+   "admin": {
+    "content": {
+      "courses": "Courses",
+      "batches": "Batches",
+      "stories": "Stories",
+      "events": "Events",
+      "edit_course": "Edit Course",
+      "edit_batch": "Edit Batch",
+      "english": "English",
+      "hindi": "Hindi",
+      "telugu": "Telugu",
+      "course_name": "Course Name",
+      "description": "Description",
+      "eligibility": "Eligibility Criteria",
+      "career_path": "Career Path",
+      "batch_name": "Batch Name",
+      "course": "Course",
+      "center": "Center",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "status": "Status"
+    }
+  }
+}
+

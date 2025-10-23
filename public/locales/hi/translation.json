@@ -1,0 +1,95 @@
+{
+  "header": {
+    "my_hub": "मेरा हब",
+    "home": "मुख पृष्ठ",
+    "success_stories": "सफलता की कहानियां",
+    "events": "आयोजन",
+    "courses": "कोर्स",
+    "logout": "लॉग आउट",
+    "login": "पूर्व छात्र लॉगिन",
+    "welcome": "नमस्ते, {{name}}"
+  },
+  "footer": {
+    "empowering_message": "हमारे पूर्व छात्रों को एक उज्जवल भविष्य के लिए सशक्त बनाना।",
+    "navigate_heading": "नेविगेट",
+    "alumni_heading": "पूर्व छात्र",
+    "copyright": "© 2025 Tata STRIVE संगठन। सर्वाधिकार सुरक्षित।"
+  },
+  "register": {
+    "title": "पूर्व छात्र नेटवर्क से जुड़ें",
+    "org_for": "{{name}} के लिए",
+    "full_name": "पूरा नाम",
+    "mobile_number": "मोबाइल नंबर",
+    "email": "ईमेल पता",
+    "submit_button": "अनुमोदन के लिए पंजीकरण करें",
+    "loading_button": "जमा हो रहा है...",
+    "success_title": "पंजीकरण जमा किया गया!",
+    "success_message": "पंजीकरण के लिए धन्यवाद। एक व्यवस्थापक शीघ्र ही अनुमोदन के लिए आपके सबमिशन की समीक्षा करेगा।",
+    "back_to_login": "लॉगिन पर वापस जाएं",
+    "not_member": "अभी तक सदस्य नहीं हैं?",
+    "register_now": "अभी पंजीकरण करें"
+  },
+  "login": {
+    "welcome": "वापसी पर स्वागत है, पूर्व छात्र!",
+    "mobile_number": "पंजीकृत मोबाइल नंबर",
+    "get_otp": "ओटीपी प्राप्त करें",
+    "sending_otp": "भेजा जा रहा है...",
+    "otp_sent": "{{mobileNumber}} पर भेजा गया 6 अंकों का ओटीपी दर्ज करें",
+    "otp_label": "वन-टाइम पासवर्ड",
+    "verify_login": "सत्यापित करें और लॉगिन करें",
+    "verifying": "सत्यापित हो रहा है...",
+    "back_to_login": "लॉगिन पर वापस जाएं"
+  },
+  "alumni_dashboard": {
+    "welcome_title": "वापसी पर स्वागत है, {{name}}!",
+    "welcome_subtitle": "आपकी यात्रा यहां जारी है। अवसर ढूंढें, साथियों से जुड़ें और बढ़ते रहें।",
+    "jobs_title": "नौकरी के अवसर",
+    "post_job": "+ नौकरी पोस्ट करें",
+    "apply_now": "अभी आवेदन करें",
+    "no_jobs": "कोई नौकरी के अवसर उपलब्ध नहीं हैं।",
+    "upskilling_title": "अपस्किलिंग पाठ्यक्रम",
+    "enroll_now": "अभी पंजीकरण करें",
+    "no_upskilling": "कोई अपस्किलिंग पाठ्यक्रम उपलब्ध नहीं है।",
+    "profile_title": "मेरी प्रोफाइल",
+    "view_profile": "मेरी प्रोफाइल देखें",
+    "connections_title": "मेरे कनेक्शन",
+    "pending_requests": "आपके पास {{count}} लंबित अनुरोध है।",
+    "pending_requests_plural": "आपके पास {{count}} लंबित अनुरोध हैं।",
+    "manage_connections": "कनेक्शन प्रबंधित करें"
+  },
+  "toasts": {
+    "apply_job_loading": "नौकरी के लिए आवेदन किया जा रहा है...",
+    "apply_job_success": "नौकरी के लिए सफलतापूर्वक आवेदन किया गया!",
+    "apply_job_error": "नौकरी के लिए आवेदन करने में विफल।",
+    "enroll_course_loading": "पाठ्यक्रम में नामांकन किया जा रहा है...",
+    "enroll_course_success": "पाठ्यक्रम में सफलतापूर्वक नामांकित!",
+    "enroll_course_error": "पाठ्यक्रम में नामांकन करने में विफल।",
+    "submit_job_loading": "नौकरी जमा की जा रही है...",
+    "submit_job_success": "नौकरी सत्यापन के लिए जमा की गई!",
+    "submit_job_error": "नौकरी जमा करने में विफल।"
+  },
+  "admin": {
+    "content": {
+      "courses": "कोर्स",
+      "batches": "बैच",
+      "stories": "कहानियां",
+      "events": "आयोजन",
+      "edit_course": "कोर्स संपादित करें",
+      "edit_batch": "बैच संपादित करें",
+      "english": "अंग्रेज़ी",
+      "hindi": "हिन्दी",
+      "telugu": "తెలుగు",
+      "course_name": "कोर्स का नाम",
+      "description": "विवरण",
+      "eligibility": "पात्रता मापदंड",
+      "career_path": "कैरियर पथ",
+      "batch_name": "बैच का नाम",
+      "course": "कोर्स",
+      "center": "केंद्र",
+      "start_date": "आरंभ तिथि",
+      "end_date": "समाप्ति तिथि",
+      "status": "स्थिति"
+    }
+  }
+}
+
