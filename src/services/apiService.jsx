@@ -35,7 +35,8 @@ export const registerAlumnus = (registrationData) => apiClient.post('/auth/regis
 export const getMyProfile = () => apiClient.get('/users/me');
 // NEW: API call to update the user's profile
 export const updateMyProfile = (profileData) => apiClient.put('/users/me', profileData);
-
+// --- NEW ADMIN USER LIST CALL ---
+export const getAlumnusUsers = () => apiClient.get('/users/alumnus/list');
 
 // --- JOB BOARD API CALLS ---
 export const getJobs = () => apiClient.get('/jobs');
@@ -67,6 +68,8 @@ export const submitFeedback = (feedbackData) => apiClient.post('/feedback', feed
 
 // --- CONTENT API CALLS ---
 export const getContentPosts = (type) => apiClient.get(`/content/${type}`);
+export const createContentPost = (postData) => apiClient.post('/content', postData);
+
 
 // --- ADMIN-SPECIFIC API CALLS ---
 export const getPendingApprovals = () => apiClient.get('/users/pending');
@@ -87,8 +90,6 @@ export const getCourses = (lang = 'en') => apiClient.get(`/courses?lang=${lang}`
 export const getCenters = () => apiClient.get('/centers');
 export const getBatches = (lang = 'en') => apiClient.get(`/batches?lang=${lang}`);
 export const getBatchesForCourse = (courseId, lang = 'en') => apiClient.get(`/courses/${courseId}/batches?lang=${lang}`);
-export const createContentPost = (postData) => apiClient.post('/content', postData);
 
 
 export default apiClient;
-

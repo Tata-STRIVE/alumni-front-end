@@ -14,7 +14,7 @@ export default {
       // Add your custom brand colors here.
       // You can now use classes like `bg-strive-blue` or `text-strive-orange`.
       colors: {
-        'strive-blue': '#005A9E',
+        'strive-blue': '#005A9E', 
         'strive-orange': '#F47B20',
         'strive-green': '#28A745',
       },

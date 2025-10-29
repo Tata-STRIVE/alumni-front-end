@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    getPendingApprovals, approveUser, 
+import {
+    getPendingApprovals, approveUser,
     getJobs, getJobApplications, updateJobApplicationStatus,
     getPendingJobs, approveJob,
     getPendingEmploymentHistory, verifyEmploymentRecord,
     getTotalAlumniCount
 } from '../services/apiService';
-// import AdminHeader from '../components/admin/AdminHeader';
+// AdminHeader import is removed as confirmed
 import StatCard from '../components/admin/StatCard';
 import ApplicantsModal from '../components/admin/ApplicantsModal';
-import ContentManagement from '../components/admin/ContentManagement'; // Add this line near the top
+import ContentManagement from '../components/admin/ContentManagement'; // Import the ContentManagement component
 
 const AdminDashboard = ({ role }) => {
+    // Add 'content_management' to the possible states
     const [activeTab, setActiveTab] = useState('approvals');
     const [pendingUsers, setPendingUsers] = useState([]);
     const [pendingJobs, setPendingJobs] = useState([]);
@@ -20,7 +21,7 @@ const AdminDashboard = ({ role }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
-    
+
     const [alumniCount, setAlumniCount] = useState(0);
 
     // State for the applicants modal
@@ -33,31 +34,30 @@ const AdminDashboard = ({ role }) => {
         setLoading(true);
         setError('');
         try {
-            // Add the new API call to the list
-            const [usersRes, jobsRes, pendingJobsRes, pendingHistoryRes, countRes] = await Promise.all([ 
-                getPendingApprovals(), 
-                getJobs(), 
+            const [usersRes, jobsRes, pendingJobsRes, pendingHistoryRes, countRes] = await Promise.all([
+                getPendingApprovals(),
+                getJobs(), // Using getJobs as per your apiService.jsx
                 getPendingJobs(),
                 getPendingEmploymentHistory(),
-                getTotalAlumniCount() // Fetch the total count
+                getTotalAlumniCount()
             ]);
             setPendingUsers(usersRes.data);
             setJobs(jobsRes.data);
             setPendingJobs(pendingJobsRes.data);
             setPendingHistory(pendingHistoryRes.data);
-            setAlumniCount(countRes.data.count); // Set the new state
-        } catch (err) { 
+            setAlumniCount(countRes.data.count);
+        } catch (err) {
             setError('Failed to load dashboard data.');
             console.error(err);
-        } finally { 
-            setLoading(false); 
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => { fetchData(); }, []);
-    
-    // Handler for approving a new user
-    const handleApproveUser = async (userId) => {
+
+    // --- Handler functions (handleApproveUser, handleApproveJob, handleApproveHistory, handleViewApplicants, handleUpdateApplicantStatus) remain the same ---
+     const handleApproveUser = async (userId) => {
         try {
             await approveUser(userId);
             setMessage('User approved successfully!');
@@ -65,7 +65,7 @@ const AdminDashboard = ({ role }) => {
             setTimeout(() => setMessage(''), 3000);
         } catch (err) { setError('Failed to approve user.'); }
     };
-    
+
     // Handler for approving a pending job
     const handleApproveJob = async (jobId) => {
         try {
@@ -85,7 +85,7 @@ const AdminDashboard = ({ role }) => {
             setTimeout(() => setMessage(''), 3000);
         } catch (err) { setError('Failed to verify record.'); }
     };
-    
+
     // Handler for opening the applicants modal
     const handleViewApplicants = async (job) => {
         setSelectedJob(job);
@@ -94,18 +94,22 @@ const AdminDashboard = ({ role }) => {
         try {
             const response = await getJobApplications(job.jobId);
             setApplicants(response.data);
-        } catch (err) { setError('Failed to load applicants for this job.'); } 
+        } catch (err) { setError('Failed to load applicants for this job.'); }
         finally { setModalLoading(false); }
     };
 
     // Handler for updating an applicant's status from the modal
     const handleUpdateApplicantStatus = async (applicationId, newStatus) => {
         try {
-            await updateJobApplicationStatus(applicationId, newStatus);
+            // Pass status in the expected object format based on API doc
+            await updateJobApplicationStatus(applicationId, { status: newStatus });
             setApplicants(prev => prev.map(app => app.applicationId === applicationId ? { ...app, status: newStatus } : app));
+             setMessage(`Applicant status updated to ${newStatus}.`); // Provide feedback
+             setTimeout(() => setMessage(''), 3000);
         } catch (err) { setError('Failed to update applicant status.'); }
     };
-    
+
+
     // Renders the content for the currently active tab
     const renderContent = () => {
         if (loading) return <div className="p-8 text-center text-gray-500">Loading content...</div>;
@@ -140,7 +144,7 @@ const AdminDashboard = ({ role }) => {
                     </table>
                 );
             case 'job_verifications':
-                return (
+                 return (
                     <table className="w-full text-sm text-left text-gray-500">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
@@ -167,9 +171,8 @@ const AdminDashboard = ({ role }) => {
                         </tbody>
                     </table>
                 );
-            
             case 'employment_verification':
-                return (
+                 return (
                     <table className="w-full text-sm text-left text-gray-500">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
@@ -198,7 +201,6 @@ const AdminDashboard = ({ role }) => {
                         </tbody>
                     </table>
                 );
-
             case 'jobs':
                 return (
                      <table className="w-full text-sm text-left text-gray-500">
@@ -224,6 +226,9 @@ const AdminDashboard = ({ role }) => {
                         </tbody>
                     </table>
                 );
+            // --- NEW CASE ---
+            case 'content_management':
+                return <ContentManagement />; // Render the imported component
             default:
                 return null;
         }
@@ -231,9 +236,9 @@ const AdminDashboard = ({ role }) => {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <StatCard role={role} />
+            {/* AdminHeader component is removed */}
             <main className="container mx-auto px-6 py-8">
-                {/* Updated Stat Card Grid */}
+                {/* Stat Card Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                    <StatCard icon="fa-users" title="Total Alumni" value={loading ? '...' : alumniCount} />
                    <StatCard icon="fa-user-plus" title="User Approvals" value={loading ? '...' : pendingUsers.length} />
@@ -241,17 +246,19 @@ const AdminDashboard = ({ role }) => {
                    <StatCard icon="fa-id-card-clip" title="Pending History" value={loading ? '...' : pendingHistory.length} />
                    <StatCard icon="fa-check-double" title="Active Jobs" value={loading ? '...' : jobs.length} />
                 </div>
-                
+
                 {message && <div className="bg-green-100 text-green-700 p-3 rounded-md mb-6">{message}</div>}
 
-                {/* Updated Tab Navigation */}
+                {/* Tab Navigation */}
                 <div className="bg-white rounded-lg shadow-md">
                     <div className="border-b border-gray-200">
-                        <nav className="-mb-px flex space-x-6 px-6" aria-label="Tabs">
+                        <nav className="-mb-px flex space-x-6 px-6 overflow-x-auto" aria-label="Tabs">
                             <button onClick={() => setActiveTab('approvals')} className={`${activeTab === 'approvals' ? 'border-strive-blue text-strive-blue' : 'border-transparent text-gray-500 hover:text-gray-700'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>User Approvals</button>
                             <button onClick={() => setActiveTab('job_verifications')} className={`${activeTab === 'job_verifications' ? 'border-strive-blue text-strive-blue' : 'border-transparent text-gray-500 hover:text-gray-700'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>Job Verifications</button>
                             <button onClick={() => setActiveTab('employment_verification')} className={`${activeTab === 'employment_verification' ? 'border-strive-blue text-strive-blue' : 'border-transparent text-gray-500 hover:text-gray-700'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>History Verifications</button>
                             <button onClick={() => setActiveTab('jobs')} className={`${activeTab === 'jobs' ? 'border-strive-blue text-strive-blue' : 'border-transparent text-gray-500 hover:text-gray-700'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>Job Management</button>
+                            {/* --- NEW TAB BUTTON --- */}
+                            <button onClick={() => setActiveTab('content_management')} className={`${activeTab === 'content_management' ? 'border-strive-blue text-strive-blue' : 'border-transparent text-gray-500 hover:text-gray-700'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>Content Management</button>
                         </nav>
                     </div>
                     <div className="p-6">
