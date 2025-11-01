@@ -50,6 +50,7 @@ const PostJobModal = ({ onClose, onSubmit }) => {
                             <label htmlFor="description" className="block text-sm font-medium text-gray-700">Job Description</label>
                             <textarea id="description" rows="4" value={description} onChange={e => setDescription(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"></textarea>
                         </div>
+                        
                     </div>
                     <div className="p-4 bg-gray-50 border-t flex justify-end space-x-3">
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300">

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { registerAlumnus, getCourses, getCenters, getBatches } from '../services/apiService';
+import { registerAlumnus } from '../services/apiService'; // Removed unused getCourses, getCenters, getBatches
 import { useTranslation } from 'react-i18next';
 
 /**
- * The final, complete RegistrationPage.
- * Now fetches master data (courses, centers, batches) from the backend
- * and displays them as dependent dropdowns for selection.
+ * Simplified RegistrationPage.
+ * Now only collects Full Name, Mobile, and Email.
+ * Course/Batch selection is removed.
  */
 const RegistrationPage = () => {
     const { t } = useTranslation();
@@ -15,16 +15,6 @@ const RegistrationPage = () => {
     const [fullName, setFullName] = useState('');
     const [mobileNumber, setMobileNumber] = useState('');
     const [email, setEmail] = useState('');
-    const [batchId, setBatchId] = useState(''); // Store the selected batch ID
-
-    // Data for dropdowns
-    const [courses, setCourses] = useState([]);
-    const [centers, setCenters] = useState([]);
-    const [batches, setBatches] = useState([]);
-    
-    // State for filtering
-    const [selectedCourse, setSelectedCourse] = useState('');
-    const [selectedCenter, setSelectedCenter] = useState('');
 
     // Tenant and UI state
     const [tenantId, setTenantId] = useState(null);
@@ -33,6 +23,7 @@ const RegistrationPage = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     
+    // This logic remains the same
     const tenants = { 'strive': 'STRIVE Organization', 'partnera': 'Partner A Foundation' };
 
     // Effect to detect tenant
@@ -51,46 +42,31 @@ const RegistrationPage = () => {
         }
     }, []);
 
-    // Effect to fetch master data (courses, centers, batches)
-    useEffect(() => {
-        if (!tenantId) return; // Don't fetch until tenant is known
-        
-        const fetchMasterData = async () => {
-            try {
-                // Fetch all data concurrently
-                const [coursesRes, centersRes, batchesRes] = await Promise.all([
-                    getCourses(),
-                    getCenters(),
-                    getBatches()
-                ]);
-                setCourses(coursesRes.data);
-                setCenters(centersRes.data);
-                setBatches(batchesRes.data);
-            } catch (err) {
-                setError("Failed to load registration data. Please try again later.");
-            }
-        };
-        fetchMasterData();
-    }, [tenantId]); // Re-run if tenantId changes
-
+    // Removed the useEffect that fetched master data
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!tenantId || !batchId) {
-            setError("Please select your course, center, and batch.");
+        // Removed !batchId check
+        if (!tenantId) {
+            setError("Could not identify organization.");
             return;
         }
         
         setLoading(true);
         setError('');
         try {
+            // --- UPDATED DATA OBJECT ---
+            // Now only sends the required fields.
+            // batchId is no longer sent.
             const registrationData = { 
                 fullName, 
                 mobileNumber, 
                 email, 
                 tenantId: tenantId.toUpperCase(),
-                batchId: parseInt(batchId)
+                batchId: null // Send null explicitly
             };
+            // --- END OF UPDATE ---
+
             await registerAlumnus(registrationData);
             setSuccess(true);
         } catch (err) {
@@ -100,16 +76,7 @@ const RegistrationPage = () => {
         }
     };
     
-    // Filter batches based on selected course and center
-    const filteredBatches = batches.filter(batch => {
-        // Find the full course and center objects to get their names
-        const course = courses.find(c => c.courseId === batch.courseId);
-        const center = centers.find(c => c.centerId === batch.centerId);
-
-        const courseMatch = !selectedCourse || (course && course.name === selectedCourse);
-        const centerMatch = !selectedCenter || (center && center.name === selectedCenter);
-        return courseMatch && centerMatch;
-    });
+    // Removed filteredBatches logic
 
     if (success) {
         return (
@@ -127,9 +94,6 @@ const RegistrationPage = () => {
 
     return (
         <div className="bg-gray-100 min-h-screen">
-            {/* Note: This page does not use the MainLayout, so it needs its own Header/Footer */}
-            {/* Or, if you moved it inside the layout in App.jsx, you can remove these. */}
-            
             <div className="flex flex-col justify-center items-center py-12 px-4">
                  <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
                     <h2 className="text-3xl font-extrabold text-strive-blue">{t('register.title')}</h2>
@@ -153,50 +117,17 @@ const RegistrationPage = () => {
                             <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
                         </div>
                         
-                        {/* --- Course, Center, and Batch Selection --- */}
-                        <div>
-                            <label htmlFor="course" className="block text-sm font-medium text-gray-700">Course</label>
-                            <select id="course" value={selectedCourse} onChange={e => setSelectedCourse(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                                <option value="">Select your course</option>
-                                {courses.map(course => (
-                                    <option key={course.courseId} value={course.name}>{course.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="center" className="block text-sm font-medium text-gray-700">Center</label>
-                            <select id="center" value={selectedCenter} onChange={e => setSelectedCenter(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-                                <option value="">Select your center</option>
-                                {centers.map(center => (
-                                    <option key={center.centerId} value={center.name}>{center.name} - {center.city}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="batch" className="block text-sm font-medium text-gray-700">Batch</label>
-                            <select id="batch" value={batchId} onChange={e => setBatchId(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" disabled={!selectedCourse || !selectedCenter}>
-                                <option value="">Select your batch</option>
-                                {filteredBatches.map(batch => (
-                                    <option key={batch.batchId} value={batch.batchId}>
-                                        {/* We assume batch DTO has these names, we may need to adjust BatchDto/Service */}
-                                        {courses.find(c => c.courseId === batch.courseId)?.name} - {centers.find(c => c.centerId === batch.centerId)?.name} ({batch.startYear})
-                                    </option>
-                                ))}
-                            </select>
-                            {selectedCourse && selectedCenter && filteredBatches.length === 0 && (
-                                <p className="mt-2 text-xs text-red-600">No matching batches found. Please check your course and center selection.</p>
-                            )}
-                        </div>
+                        {/* --- REMOVED Course, Center, and Batch Selection --- */}
 
                         <div>
-                            <button type="submit" disabled={loading || !tenantId || !batchId} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-strive-orange hover:bg-opacity-90 disabled:bg-gray-400">
+                            {/* Removed !batchId from disabled check */}
+                            <button type="submit" disabled={loading || !tenantId} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-strive-orange hover:bg-opacity-90 disabled:bg-gray-400">
                                 {loading ? t('register.loading_button') : t('register.submit_button')}
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
-            {/* <Footer /> */}
         </div>
     );
 };

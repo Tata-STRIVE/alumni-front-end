@@ -7,7 +7,9 @@
     "courses": "Courses",
     "logout": "Logout",
     "login": "Alumni Login",
-    "welcome": "Welcome, {{name}}"
+    "welcome": "Welcome, {{name}}",
+     "job_opportunities":"Job Opportunities"
+
   },
   "footer": {
     "empowering_message": "Empowering our alumni for a brighter future.",
@@ -27,7 +29,10 @@
     "success_message": "Thank you for registering. An admin will review your submission for approval shortly.",
     "back_to_login": "Back to Login",
     "not_member": "Not a member yet?",
-    "register_now": "Register Now"
+    "register_now": "Register Now",
+    "profilePictureUrl" : "Profile Picture URL",
+        "highestEducationQualification" : "highest Education Qualification"
+
   },
   "login": {
     "welcome": "Welcome Back, Alumni!",

@@ -1,11 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { getJobs, getUpskillingOpportunities, applyForJob, applyForUpskilling, submitJobForVerification } from '../services/apiService';
+import { getJobs, getUpskillingOpportunities, applyForJob, applyForUpskilling, submitJobForVerification ,
+    getMyProfile} from '../services/apiService';
 import PostJobModal from '../components/alumni/PostJobModal';
 import toast from 'react-hot-toast'; // Import the toast function
 import { useTranslation } from 'react-i18next'; // Import the hook
+import apiClient from '../services/apiService'; // --- NEW: Import apiClient to build URL
 
+/**
+ * Helper to build the full, absolute URL for a file.
+ * @param {string} relativePath - The path from the DB (e.g., "STRIVE/uuid/photo.png")
+ * @returns {string|null} - The full URL or null.
+ */
+const buildFileUrl = (relativePath) => {
+    if (!relativePath) return null;
+    
+    // Check if it's already a full URL (less likely but safe)
+    if (relativePath.startsWith('http')) {
+        return relativePath;
+    }
+
+    // Construct the full URL using the API base URL
+    // e.g., http://localhost:8080/api/files/download/STRIVE/uuid/photo.png
+    const baseUrl = apiClient.defaults.baseURL;
+    
+    // Handle relative paths that might start with /api or not
+    if (relativePath.startsWith('/api/files/download/')) {
+        return `${baseUrl}${relativePath.substring(4)}`; // Remove '/api'
+    }
+    if (relativePath.startsWith('files/download/')) {
+         return `${baseUrl}/${relativePath}`;
+    }
+    // This is the most likely path format from the FileController: "TENANT/USER/file.ext"
+    return `${baseUrl}/files/download/${relativePath}`;
+};
 const AlumniDashboard = () => {
     const { user } = useAuth();
     const { t } = useTranslation(); // Initialize the translation function
@@ -14,13 +43,15 @@ const AlumniDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
+ // --- NEW: State to hold the full profile ---
+    const [profile, setProfile] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             setError('');
             try {
-                const [jobsResponse, upskillingResponse] = await Promise.all([ getJobs(), getUpskillingOpportunities() ]);
+                const [jobsResponse, upskillingResponse] = await Promise.all([ getJobs(),getMyProfile(),getUpskillingOpportunities() ]);
                 setJobs(jobsResponse.data);
                 setUpskilling(upskillingResponse.data);
             } catch (err) {
@@ -69,6 +100,8 @@ const AlumniDashboard = () => {
 
     if (loading) { /* ... */ }
     if (error && jobs.length === 0) { /* ... */ }
+const photoSrc = profile ? buildFileUrl(profile.profilePictureUrl) : null;
+    const initial = user.fullName ? user.fullName.charAt(0) : '?';
 
     return (
         <>
@@ -113,9 +146,15 @@ const AlumniDashboard = () => {
                    
                    <div className="space-y-8">
                         <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                             <div className="w-24 h-24 rounded-full bg-strive-orange text-white mx-auto mb-4 flex items-center justify-center">
-                                <span className="text-4xl font-bold">{user.fullName ? user.fullName.charAt(0) : '?'}</span>
+                              {/* --- FIX: Updated Image Rendering --- */}
+                             <div className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden bg-gray-200 text-gray-500 border border-gray-300">
+                                {photoSrc ? (
+                                    <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-4xl font-bold">{initial}</span>
+                                )}
                             </div>
+                            {/* --- END OF FIX --- */}
                             <h3 className="font-bold text-xl text-gray-800">{user.fullName || 'Alumnus'}</h3>
                             <p className="text-sm text-gray-500">{user.mobileNumber}</p>
                             <Link to="/dashboard/profile" className="mt-4 w-full block text-center bg-strive-blue text-white py-2 rounded-md text-sm font-semibold">{t('alumni_dashboard.view_profile')}</Link>

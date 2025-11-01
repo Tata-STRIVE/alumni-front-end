@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getContentPosts } from '../services/apiService';
 import toast from 'react-hot-toast';
+import StoryModal from '../components/content/StoryModal'; // Import the new modal
 
 const SuccessStoriesPage = () => {
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [selectedPost, setSelectedPost] = useState(null); // State for the modal content
 
     useEffect(() => {
         const fetchStories = async () => {
@@ -26,6 +28,15 @@ const SuccessStoriesPage = () => {
         fetchStories();
     }, []);
 
+
+
+       const openModal = (post) => {
+        setSelectedPost(post);
+    };
+
+    const closeModal = () => {
+        setSelectedPost(null);
+    };
     const renderStoryCard = (story) => {
         // Use the fields from the ContentPostDto (alumnusName, alumnusBatchName, alumnusCenterName, etc.)
         const batchInfo = [story.alumnusBatchName, story.alumnusCenterName].filter(Boolean).join(', ');
@@ -53,13 +64,12 @@ const SuccessStoriesPage = () => {
                 </div>
                 <div className="p-6 pt-0">
                     <p className="mt-2 text-gray-600 line-clamp-4">{story.content}</p>
-                    <button 
-                        // In a real application, this would open a full detail modal/page
-                        onClick={() => toast.success("Feature coming soon: View full story details!")}
-                        className="mt-4 text-sm text-strive-blue font-semibold hover:underline"
-                    >
-                        Read Full Story &rarr;
-                    </button>
+                
+
+<button onClick={() => openModal(story)} className="text-strive-orange font-semibold text-sm hover:underline">
+                                                        Read Full Story &rarr;
+                                                    </button>
+
                 </div>
             </div>
         );
@@ -91,6 +101,10 @@ const SuccessStoriesPage = () => {
                     </div>
                 </div>
             </main>
+
+               {/* Modal for Full Content */}
+            {selectedPost && <StoryModal post={selectedPost} onClose={closeModal} />}
+ 
         </div>
     );
 };

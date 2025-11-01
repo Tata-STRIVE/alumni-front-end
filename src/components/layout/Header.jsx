@@ -45,7 +45,7 @@ const Header = () => {
             <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center">
-                        <Link to="/dashboard" className="text-white font-bold text-xl flex-shrink-0">
+                        <Link to="/" className="text-white font-bold text-xl flex-shrink-0">
                             STRIVE <span className="text-strive-orange">Connect</span>
                         </Link>
                         <div className="hidden md:block md:ml-10">
@@ -55,6 +55,7 @@ const Header = () => {
                                 <NavLink to="/success-stories" className={navLinkClasses}>{t('header.success_stories')}</NavLink>
                                 <NavLink to="/events" className={navLinkClasses}>{t('header.events')}</NavLink>
                                 <NavLink to="/courses" className={navLinkClasses}>{t('header.courses')}</NavLink>
+        
                             </div>
                         </div>
                     </div>

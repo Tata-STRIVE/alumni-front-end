@@ -1,22 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import { createCourse, updateCourse } from '../../services/apiService'; // Import API functions
 
 /**
- * NEW: Modal form for Admins to create or edit a Course.
- * This component demonstrates the multilingual input fields.
+ * Modal form for Admins to create or edit a Course.
+ * Handles multilingual input fields and API submission.
  */
-const CourseEditModal = ({ onClose, onSave, existingCourse }) => {
+const CourseEditModal = ({ onClose, onCourseSaved, existingCourse }) => {
     const { t } = useTranslation();
+    const [loading, setLoading] = useState(false);
     const [activeLang, setActiveLang] = useState('en');
-    const [iconUrl, setIconUrl] = useState('');
+    const [iconUrl, setIconUrl] = useState(existingCourse?.iconUrl || '');
 
-    // State to hold the translations
     const [translations, setTranslations] = useState({
         en: { name: '', description: '', eligibilityCriteria: '', careerPath: '' },
         hi: { name: '', description: '', eligibilityCriteria: '', careerPath: '' },
         te: { name: '', description: '', eligibilityCriteria: '', careerPath: '' },
     });
+
+    // Effect to pre-fill the form when editing an existing course
+    useEffect(() => {
+        if (existingCourse && existingCourse.translations) {
+            const initialTranslations = { ...translations };
+            existingCourse.translations.forEach(t => {
+                const langCode = t.languageCode.toLowerCase();
+                if (initialTranslations[langCode]) {
+                    initialTranslations[langCode] = {
+                        name: t.name || '',
+                        description: t.description || '',
+                        eligibilityCriteria: t.eligibilityCriteria || '',
+                        careerPath: t.careerPath || '',
+                    };
+                }
+            });
+            setTranslations(initialTranslations);
+        }
+    }, [existingCourse]);
 
     // Handle form field changes for the currently active language
     const handleLangChange = (e) => {
@@ -30,66 +50,144 @@ const CourseEditModal = ({ onClose, onSave, existingCourse }) => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        toast.success("Save logic not implemented yet.");
-        // onSave({ iconUrl, translations });
+        setLoading(true);
+        const toastId = toast.loading(existingCourse ? 'Updating Course...' : 'Creating Course...');
+
+        // 1. Format translations into the DTO list structure required by the backend
+        const translationList = Object.keys(translations).map(langCode => ({
+            languageCode: langCode.toUpperCase(),
+            ...translations[langCode],
+        }));
+
+        // 2. Construct the final DTO payload
+        const courseData = {
+            iconUrl,
+            translations: translationList
+        };
+
+        try {
+            if (existingCourse) {
+                await updateCourse(existingCourse.courseId, courseData);
+                toast.success('Course updated successfully!', { id: toastId });
+            } else {
+                await createCourse(courseData);
+                toast.success('New Course created successfully!', { id: toastId });
+            }
+            
+            if (onCourseSaved) onCourseSaved();
+            onClose();
+
+        } catch (err) {
+            const errorMsg = err.response?.data?.error || 'Failed to save course details.';
+            toast.error(errorMsg, { id: toastId });
+            console.error('API Error:', err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const langTabs = [
-        { code: 'en', name: t('admin.content.english') },
-        { code: 'hi', name: t('admin.content.hindi') },
-        { code: 'te', name: t('admin.content.telugu') },
+        { code: 'en', name: t('admin.content.english') || 'English' },
+        { code: 'hi', name: t('admin.content.hindi') || 'Hindi' },
+        { code: 'te', name: t('admin.content.telugu') || 'Telugu' },
     ];
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
                 <form onSubmit={handleSubmit}>
-                    <div className="p-6 border-b">
-                        <h3 className="text-lg font-semibold text-gray-800">{t('admin.content.edit_course')}</h3>
+                    <div className="p-6 border-b flex justify-between items-center">
+                        <h3 className="text-lg font-semibold text-gray-800">{existingCourse ? 'Edit Course' : 'Add New Course'}</h3>
+                         <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-800">&times;</button>
                     </div>
 
-                    {/* Language TABS */}
-                    <div className="p-6 border-b">
-                        <nav className="flex space-x-4">
-                            {langTabs.map(tab => (
-                                <button
-                                    type="button"
-                                    key={tab.code}
-                                    onClick={() => setActiveLang(tab.code)}
-                                    className={`px-3 py-2 font-medium text-sm rounded-md ${activeLang === tab.code ? 'bg-strive-blue text-white' : 'text-gray-500 hover:bg-gray-100'}`}
-                                >
-                                    {tab.name}
-                                </button>
-                            ))}
-                        </nav>
-                    </div>
+                    <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                        {/* Icon URL (Non-Translated Field) */}
+                        <div>
+                            <label className="block text-sm font-medium">Icon URL (e.g., Font Awesome class)</label>
+                            <input 
+                                type="text" 
+                                value={iconUrl} 
+                                onChange={e => setIconUrl(e.target.value)} 
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2" 
+                                placeholder="fa-briefcase"
+                            />
+                        </div>
 
-                    {/* Form Fields for the active language */}
-                    <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-                        <p className="text-sm font-semibold">Editing content for: <span className="uppercase font-bold text-strive-orange">{activeLang}</span></p>
-                        <div>
-                            <label className="block text-sm font-medium">{t('admin.content.course_name')}</label>
-                            <input type="text" name="name" value={translations[activeLang].name} onChange={handleLangChange} className="mt-1 block w-full border border-gray-300 rounded-md" />
+                        {/* Language TABS */}
+                        <div className="border-b pt-4">
+                            <nav className="flex space-x-4">
+                                {langTabs.map(tab => (
+                                    <button
+                                        type="button"
+                                        key={tab.code}
+                                        onClick={() => setActiveLang(tab.code)}
+                                        className={`px-3 py-2 font-medium text-sm rounded-t-md border-b-2 ${activeLang === tab.code ? 'border-strive-blue text-strive-blue' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                                    >
+                                        {tab.name}
+                                    </button>
+                                ))}
+                            </nav>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium">{t('admin.content.description')}</label>
-                            <textarea name="description" rows="3" value={translations[activeLang].description} onChange={handleLangChange} className="mt-1 block w-full border border-gray-300 rounded-md"></textarea>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">{t('admin.content.eligibility')}</label>
-                            <textarea name="eligibilityCriteria" rows="2" value={translations[activeLang].eligibilityCriteria} onChange={handleLangChange} className="mt-1 block w-full border border-gray-300 rounded-md"></textarea>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">{t('admin.content.career_path')}</label>
-                            <textarea name="careerPath" rows="2" value={translations[activeLang].careerPath} onChange={handleLangChange} className="mt-1 block w-full border border-gray-300 rounded-md"></textarea>
+                        
+                        <p className="text-sm font-semibold pt-4">Content for: <span className="uppercase font-bold text-strive-orange">{activeLang}</span> (Required for English)</p>
+                        
+                        {/* Form Fields for the active language */}
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium">Course Name</label>
+                                <input 
+                                    type="text" 
+                                    name="name" 
+                                    value={translations[activeLang].name} 
+                                    onChange={handleLangChange} 
+                                    required={activeLang === 'en'} // Only enforce 'en' translation
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2" 
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium">Description</label>
+                                <textarea 
+                                    name="description" 
+                                    rows="3" 
+                                    value={translations[activeLang].description} 
+                                    onChange={handleLangChange} 
+                                    required={activeLang === 'en'} 
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium">Eligibility Criteria</label>
+                                <textarea 
+                                    name="eligibilityCriteria" 
+                                    rows="2" 
+                                    value={translations[activeLang].eligibilityCriteria} 
+                                    onChange={handleLangChange} 
+                                    required={activeLang === 'en'} 
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium">Career Path</label>
+                                <textarea 
+                                    name="careerPath" 
+                                    rows="2" 
+                                    value={translations[activeLang].careerPath} 
+                                    onChange={handleLangChange} 
+                                    required={activeLang === 'en'} 
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                ></textarea>
+                            </div>
                         </div>
                     </div>
                     
                     <div className="p-4 bg-gray-50 border-t flex justify-end space-x-2">
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md">Cancel</button>
-                        <button type="submit" className="px-4 py-2 bg-strive-blue text-white rounded-md">Save Course</button>
+                        <button type="submit" disabled={loading} className="px-4 py-2 bg-strive-blue text-white rounded-md disabled:bg-gray-400">
+                            {loading ? 'Saving...' : 'Save Course'}
+                        </button>
                     </div>
                 </form>
             </div>
