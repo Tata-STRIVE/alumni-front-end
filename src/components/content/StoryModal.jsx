@@ -1,4 +1,5 @@
 import React from 'react';
+import { buildFileUrl } from '../../utils/fileUrl'; // --- 1. IMPORT THE HELPER ---
 
 /**
  * Reusable modal component to display the full details of a ContentPost (Success Story or Event).
@@ -21,6 +22,10 @@ const StoryModal = ({ post, onClose }) => {
 
     const isStory = post.postType === 'SUCCESS_STORY';
 
+    // --- 2. USE THE HELPER ---
+    const photoUrl = buildFileUrl(post.studentPhotoUrl);
+    const fallbackInitial = post.alumnusName ? post.alumnusName.charAt(0) : 'A';
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden animate-fade-in-up">
@@ -40,12 +45,12 @@ const StoryModal = ({ post, onClose }) => {
                         <div className="flex items-center space-x-4 pb-4 border-b">
                             {/* Alumnus Photo/Avatar */}
                             <img 
-                                src={post.studentPhotoUrl || `https://placehold.co/64x64/005A9E/F47B20?text=${post.alumnusName.charAt(0)}`} 
+                                src={photoUrl || `https://placehold.co/64x64/005A9E/F47B20?text=${fallbackInitial}`} 
                                 alt={`${post.alumnusName} profile`} 
                                 className="w-16 h-16 rounded-full object-cover border-2 border-strive-orange"
                                 onError={(e) => {
                                     e.target.onerror = null; 
-                                    e.target.src=`https://placehold.co/64x64/005A9E/F47B20?text=${post.alumnusName.charAt(0)}`;
+                                    e.target.src=`https://placehold.co/64x64/005A9E/F47B20?text=${fallbackInitial}`;
                                 }}
                             />
                             <div>
@@ -100,3 +105,4 @@ const StoryModal = ({ post, onClose }) => {
 };
 
 export default StoryModal;
+

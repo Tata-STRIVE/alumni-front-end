@@ -12,7 +12,7 @@ import {
 } from '../services/apiService';
 import EmploymentHistoryModal from '../components/profile/EmploymentHistoryModal';
 import toast from 'react-hot-toast';
-import apiClient from '../services/apiService'; // Import apiClient to get the baseURL
+import { buildFileUrl } from '../utils/fileUrl'; // --- 1. IMPORT THE HELPER ---
 
 /**
  * Modal for the secure 2-step mobile number change
@@ -152,10 +152,8 @@ const ProfilePage = () => {
     const [isChangeMobileModalOpen, setIsChangeMobileModalOpen] = useState(false);
     const fileInputRef = useRef(null); 
 
-    // --- FIX 2: State for new file selection ---
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
-    // --- End of FIX 2 ---
 
     const hasPresentJob = history.some(h => 
         h.endDate === null && (!editingHistoryItem || h.employmentId !== editingHistoryItem.employmentId)
@@ -229,10 +227,8 @@ const ProfilePage = () => {
     // --- Profile Edit Handlers ---
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
-        // --- FIX: Clear file previews on cancel ---
         setSelectedFile(null);
         setPreviewUrl(null);
-        // --- End of FIX ---
         if (!isEditing && profile) {
             // Reset editData to profile's current state when "Edit" is clicked
             setEditData({
@@ -251,7 +247,6 @@ const ProfilePage = () => {
         setEditData(prev => ({ ...prev, [name]: value }));
     };
 
-    // --- FIX 2: Updated File Change Handler ---
     // This now only selects the file and creates a local preview
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -266,12 +261,10 @@ const ProfilePage = () => {
         setPreviewUrl(URL.createObjectURL(file));
         toast.success('Photo selected. Click "Save Changes" to apply.');
         
-        // Reset file input to allow re-uploading the same file if needed
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     };
-    // --- End of FIX 2 ---
 
 
     // Handles saving the entire profile form
@@ -283,7 +276,6 @@ const ProfilePage = () => {
         try {
             let profileData = { ...editData };
 
-            // --- FIX 2: Transactional File Upload ---
             // If a new file was selected, upload it first
             if (selectedFile) {
                 toast.loading('Uploading photo...', { id: toastId });
@@ -293,7 +285,6 @@ const ProfilePage = () => {
                 // Add the *new* URL to the data we are about to save
                 profileData.profilePictureUrl = newPhotoUrl;
             }
-            // --- End of FIX 2 ---
 
             toast.loading('Saving profile data...', { id: toastId });
             
@@ -322,23 +313,11 @@ const ProfilePage = () => {
         logout(); // Force logout after successful mobile change
     };
 
-    // --- FIX 1: Helper to build the full, absolute URL for display ---
-    const buildFileUrl = (relativePath) => {
-        if (!relativePath) {
-            return null;
-        }
-        // Use the base URL from the imported apiClient instance
-        // This ensures it points to http://localhost:8080/api
-        // and constructs the correct download path.
-        return `http://localhost:8080${relativePath}`;
-    };
-    // --- End of FIX 1 ---
-
-
     // --- Render Logic ---
     if (loading && !profile) return <div className="text-center py-10 text-gray-500">Loading profile...</div>;
     if (!profile) return <div className="text-center py-10 text-red-500">Could not load profile.</div>;
-    // --- FIX 1 & 2: Updated logic for photoSrc ---
+
+    // --- 2. UPDATED PHOTO LOGIC ---
     let photoSrc = null;
     if (previewUrl) {
         // 1. Highest priority: Show the new local file preview
@@ -350,8 +329,7 @@ const ProfilePage = () => {
         // 3. Show the saved URL from the main profile object
         photoSrc = buildFileUrl(profile.profilePictureUrl);
     }
-    // --- End of FIX 1 & 2 ---
-
+    // --- END OF PHOTO LOGIC ---
 
     return (
         <>
@@ -485,7 +463,7 @@ const ProfilePage = () => {
                             <div className="bg-white p-6 rounded-lg shadow-md">
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="text-xl font-semibold">Employment History</h3>
-                                    <button type="button" onClick={() => setIsModalOpen(true)} className="text-sm bg-strive-orange text-white px-4 py-2 rounded-md hover:bg-opacity-9g0">
+                                    <button type="button" onClick={() => setIsModalOpen(true)} className="text-sm bg-strive-orange text-white px-4 py-2 rounded-md hover:bg-opacity-90">
                                         + Add New
                                     </button>
                                 </div>
@@ -503,18 +481,23 @@ const ProfilePage = () => {
                                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                                                         h.status === 'VERIFIED' 
                                                         ? 'bg-green-100 text-green-800' 
-                                                        : 'bg-yellow-100 text-yellow-800'
+                                                        : (h.status === 'REJECTED' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')
                                                     }`}>
                                                         {h.status.replace('_', ' ')}
                                                     </span>
-                                                    {/* Only allow editing PENDING records or the current 'Present' job (to add an end date) */}
-                                                    {(h.status === 'PENDING_VERIFICATION' || h.endDate === null) && (
+                                                    {/* Show remarks if rejected */}
+                                                    {h.status === 'REJECTED' && h.adminRemarks && (
+                                                        <p className="text-xs text-red-600 w-full text-right">Note: {h.adminRemarks}</p>
+                                                    )}
+                                                    
+                                                    {/* Allow editing PENDING, REJECTED, or the current 'Present' job */}
+                                                    {(h.status === 'PENDING_VERIFICATION' || h.status === 'REJECTED' || h.endDate === null) && (
                                                         <button type
                                                             ="button" 
                                                             onClick={() => handleEditHistory(h)} 
                                                             className="text-xs text-strive-blue font-semibold hover:underline"
                                                         >
-                                                            Edit
+                                                            {h.status === 'REJECTED' ? 'Edit & Resubmit' : 'Edit'}
                                                         </button>
                                                     )}
                                                 </div>

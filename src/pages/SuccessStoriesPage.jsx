@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getContentPosts } from '../services/apiService';
 import toast from 'react-hot-toast';
-import StoryModal from '../components/content/StoryModal'; // Import the new modal
+import StoryModal from '../components/content/StoryModal'; 
+import { buildFileUrl } from '../utils/fileUrl'; // --- 1. IMPORT THE HELPER ---
 
 const SuccessStoriesPage = () => {
     const [stories, setStories] = useState([]);
@@ -41,17 +42,22 @@ const SuccessStoriesPage = () => {
         // Use the fields from the ContentPostDto (alumnusName, alumnusBatchName, alumnusCenterName, etc.)
         const batchInfo = [story.alumnusBatchName, story.alumnusCenterName].filter(Boolean).join(', ');
 
+        // --- 2. USE THE HELPER ---
+        const photoUrl = buildFileUrl(story.studentPhotoUrl);
+        const fallbackInitial = story.alumnusName ? story.alumnusName.charAt(0) : 'A';
+
+
         return (
             <div key={story.postId} className="bg-white rounded-lg shadow-lg overflow-hidden transition-shadow duration-300 hover:shadow-xl">
                 <div className="flex items-start p-6">
                     {/* Placeholder for Alumnus Photo */}
                     <img 
-                        src={story.studentPhotoUrl || `https://placehold.co/80x80/005A9E/F47B20?text=${story.alumnusName ? story.alumnusName.charAt(0) : 'A'}`} 
+                        src={photoUrl || `https://placehold.co/80x80/005A9E/F47B20?text=${fallbackInitial}`} 
                         alt={`${story.alumnusName} profile`} 
                         className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-strive-orange"
                         onError={(e) => {
                             e.target.onerror = null; 
-                            e.target.src=`https://placehold.co/80x80/005A9E/F47B20?text=${story.alumnusName ? story.alumnusName.charAt(0) : 'A'}`;
+                            e.target.src=`https://placehold.co/80x80/005A9E/F47B20?text=${fallbackInitial}`;
                         }}
                     />
                     <div>
@@ -66,7 +72,7 @@ const SuccessStoriesPage = () => {
                     <p className="mt-2 text-gray-600 line-clamp-4">{story.content}</p>
                 
 
-<button onClick={() => openModal(story)} className="text-strive-orange font-semibold text-sm hover:underline">
+<button onClick={() => openModal(story)} className="mt-4 text-strive-orange font-semibold text-sm hover:underline">
                                                         Read Full Story &rarr;
                                                     </button>
 
@@ -110,3 +116,4 @@ const SuccessStoriesPage = () => {
 };
 
 export default SuccessStoriesPage;
+

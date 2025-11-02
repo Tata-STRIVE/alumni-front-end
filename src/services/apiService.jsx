@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; // You will need this for the interceptor
 
 // Create an Axios instance with a base URL for your Spring Boot backend.
 const apiClient = axios.create({
@@ -88,11 +87,14 @@ export const getJobs = () => {
 export const applyForJob = (jobId) => apiClient.post(`/jobs/${jobId}/apply`);
 export const submitJobForVerification = (jobData) => apiClient.post('/jobs/submit', jobData);
 export const getMyJobApplications = () => apiClient.get('/jobs/my-applications');
+// --- NEW: Fix for your error ---
+export const getMyPostedJobs = () => apiClient.get('/jobs/my-posts');
+
 
 // --- UPSKILLING API CALLS ---
 export const getUpskillingOpportunities = () => {
     const tenantId = getTenantIdFromUrl();
-    return apiClient.get(`/upskilling?tenantId=${tenantId}`);
+    return apiClient.get(`/upskilling/tenantId/${tenantId}`);
 };
 export const applyForUpskilling = (opportunityId) => apiClient.post(`/upskilling/${opportunityId}/apply`);
 export const getMyUpskillingApplications = () => apiClient.get('/upskilling/my-applications');
@@ -115,7 +117,6 @@ export const submitFeedback = (feedbackData) => apiClient.post('/feedback', feed
 // --- CONTENT API CALLS (Public Access) ---
 export const getContentPosts = (type) => {
     const tenantId = getTenantIdFromUrl();
-    console.log(`URI: content/${type}/tenantId/${tenantId}`);
     return apiClient.get(`/content/${type}/tenantId/${tenantId}`);
 };
 
@@ -126,11 +127,11 @@ export const getCourses = (lang = 'en') => {
 };
 export const getCenters = () => {
     const tenantId = getTenantIdFromUrl();
-    return apiClient.get(`/centers?tenantId=${tenantId}`);
+    return apiClient.get(`/centers/tenantId/${tenantId}`);
 };
 export const getBatches = (lang = 'en') => {
     const tenantId = getTenantIdFromUrl();
-    return apiClient.get(`/batches?lang=${lang}&tenantId=${tenantId}`);
+    return apiClient.get(`/batches?lang=${lang}&tenantId/${tenantId}`);
 };
 export const getBatchesForCourse = (courseId, lang = 'en') => {
     const tenantId = getTenantIdFromUrl();
@@ -144,21 +145,13 @@ export const approveUser = (userId) => apiClient.post(`/users/${userId}/approve`
 export const createJobByAdmin = (jobData) => apiClient.post('/jobs', jobData);
 export const getJobApplications = (jobId) => apiClient.get(`/jobs/${jobId}/applications`);
 export const updateJobApplicationStatus = (appId, statusDto) => apiClient.put(`/jobs/applications/${appId}`, statusDto);
-export const updateJob = (jobId, jobData) => apiClient.put(`/jobs/${jobId}`, jobData); // New
+export const updateJob = (jobId, jobData) => apiClient.put(`/jobs/${jobId}`, jobData);
 export const getPendingJobs = () => apiClient.get('/jobs/pending');
-export const approveJob = (jobId) => apiClient.post(`/jobs/${jobId}/approve`);
-export const getHistoryForUser = (userId) => apiClient.get(`/employment-history/user/${userId}`);
-export const verifyEmploymentRecord = () => apiClient.get('/employment-history/pending');
-export const deleteJob = (jobId) => apiClient.delete(`/jobs/${jobId}`); // New
-export const reviewAlumniJob = (jobId, reviewData) => apiClient.post(`/jobs/${jobId}/review`, reviewData); // New
+export const deleteJob = (jobId) => apiClient.delete(`/jobs/${jobId}`);
+export const reviewAlumniJob = (jobId, reviewData) => apiClient.post(`/jobs/${jobId}/review`, reviewData);
+export const closeJob = (jobId) => apiClient.post(`/jobs/${jobId}/close`); // New
 
-// --- THIS IS THE FIX ---
-// Renamed from 'verifyEmploymentRecord' to 'reviewEmploymentRecord'
-// Updated endpoint from '/verify' to '/review'
-// Sends the new AdminReviewDto payload
 export const reviewEmploymentRecord = (historyId, reviewData) => apiClient.post(`/employment-history/${historyId}/review`, reviewData);
-// --- END OF FIX ---
-
 export const getPendingEmploymentHistory = () => apiClient.get('/employment-history/pending');
 export const getTotalAlumniCount = () => apiClient.get('/users/count');
 export const createUpskillingOpportunity = (oppData) => apiClient.post('/upskilling', oppData);
@@ -171,6 +164,8 @@ export const createCourse = (courseData) => apiClient.post('/courses', courseDat
 export const updateCourse = (courseId, courseData) => apiClient.put(`/courses/${courseId}`, courseData);
 export const createBatch = (batchData) => apiClient.post('/batches', batchData);
 export const updateBatch = (batchId, batchData) => apiClient.put(`/batches/${batchId}`, batchData);
+export const updateContentPost = (postId, postData) => apiClient.put(`/content/${postId}`, postData);
+export const deleteContentPost = (postId) => apiClient.delete(`/content/${postId}`);
 
 
 export default apiClient;

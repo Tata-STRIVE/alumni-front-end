@@ -1,31 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getContentPosts } from '../services/apiService';
-import StoryModal from '../components/content/StoryModal'; // Import the new modal
+import StoryModal from '../components/content/StoryModal'; 
 import toast from 'react-hot-toast';
+import { buildFileUrl } from '../utils/fileUrl'; // --- 1. IMPORT THE HELPER ---
 
 const HomePage = () => {
     const [stories, setStories] = useState([]);
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedPost, setSelectedPost] = useState(null); // State for the modal content
+    const [selectedPost, setSelectedPost] = useState(null); 
 
     useEffect(() => {
         const fetchContent = async () => {
             setLoading(true);
             try {
-                // Fetch top 3 Success Stories
                 const [storiesRes, eventsRes] = await Promise.all([
                     getContentPosts('SUCCESS_STORY'),
                     getContentPosts('EVENT')
                 ]);
                 
-                // Sort by creation date and take the top 3
                 const latestStories = storiesRes.data
                     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                     .slice(0, 3);
                 
-                // Sort by creation date and take the top 2 events
                  const latestEvents = eventsRes.data
                     .sort((a, b) => new Date(b.eventDate || b.createdAt) - new Date(a.eventDate || a.createdAt))
                     .slice(0, 2);
@@ -79,6 +77,8 @@ const HomePage = () => {
                     </div>
                 </div>
 
+             
+
                 {/* Success Stories Section */}
                 <div className="bg-gray-100 py-20">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -88,31 +88,37 @@ const HomePage = () => {
                                 <div className="text-center text-gray-500">Loading inspiring stories...</div>
                             ) : stories.length > 0 ? (
                                 <div className="grid gap-8 lg:grid-cols-3">
-                                    {stories.map((story) => (
-                                        <div key={story.postId} className="bg-white rounded-lg shadow-md hover:-translate-y-1 transition-transform border border-l-4 border-strive-blue">
-                                            <div className="p-6">
-                                                <div className="flex items-center mb-3">
-                                                    <img 
-                                                        src={story.studentPhotoUrl || `https://placehold.co/40x40/005A9E/F47B20?text=${story.alumnusName ? story.alumnusName.charAt(0) : 'A'}`} 
-                                                        alt={`${story.alumnusName} avatar`} 
-                                                        className="w-10 h-10 rounded-full object-cover mr-3"
-                                                        onError={(e) => {
-                                                            e.target.onerror = null; 
-                                                            e.target.src=`https://placehold.co/40x40/005A9E/F47B20?text=${story.alumnusName ? story.alumnusName.charAt(0) : 'A'}`;
-                                                        }}
-                                                    />
-                                                    <h3 className="text-lg font-semibold text-strive-blue">{story.alumnusName || 'Alumnus'}</h3>
-                                                </div>
-                                                <p className="font-medium text-gray-700 mb-2">{story.title}</p>
-                                                <p className="mt-3 text-sm text-gray-500 line-clamp-3">{story.content}</p>
-                                                <div className="mt-4">
-                                                    <button onClick={() => openModal(story)} className="text-strive-orange font-semibold text-sm hover:underline">
-                                                        Read More &rarr;
-                                                    </button>
+                                    {stories.map((story) => {
+                                        // --- 2. USE THE HELPER ---
+                                        const photoUrl = buildFileUrl(story.studentPhotoUrl);
+                                        const fallbackInitial = story.alumnusName ? story.alumnusName.charAt(0) : 'A';
+
+                                        return (
+                                            <div key={story.postId} className="bg-white rounded-lg shadow-md hover:-translate-y-1 transition-transform border border-l-4 border-strive-blue">
+                                                <div className="p-6">
+                                                    <div className="flex items-center mb-3">
+                                                        <img 
+                                                            src={photoUrl || `https://placehold.co/40x40/005A9E/F47B20?text=${fallbackInitial}`} 
+                                                            alt={`${story.alumnusName} avatar`} 
+                                                            className="w-10 h-10 rounded-full object-cover mr-3"
+                                                            onError={(e) => {
+                                                                e.target.onerror = null; 
+                                                                e.target.src=`https://placehold.co/40x40/005A9E/F47B20?text=${fallbackInitial}`;
+                                                            }}
+                                                        />
+                                                        <h3 className="text-lg font-semibold text-strive-blue">{story.alumnusName || 'Alumnus'}</h3>
+                                                    </div>
+                                                    <p className="font-medium text-gray-700 mb-2">{story.title}</p>
+                                                    <p className="mt-3 text-sm text-gray-500 line-clamp-3">{story.content}</p>
+                                                    <div className="mt-4">
+                                                        <button onClick={() => openModal(story)} className="text-strive-orange font-semibold text-sm hover:underline">
+                                                            Read More &rarr;
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             ) : (
                                 <p className="text-center text-gray-500">No stories posted yet. Check back soon!</p>
@@ -159,12 +165,39 @@ const HomePage = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Hiring Partners Section (from mockup) */}
+                <div className="bg-gray-50 py-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <h2 className="text-3xl font-extrabold text-gray-900 text-center">Our Hiring Partners</h2>
+                        <p className="text-center mt-4 text-lg text-gray-600">We are proud to be associated with leading companies across industries.</p>
+                        <div className="mt-12 flow-root">
+                            <div className="-mt-4 -ml-8 flex flex-wrap justify-center">
+                                <div className="mt-4 ml-8 flex flex-shrink-0 flex-grow justify-center lg:flex-grow-0">
+                                    <img className="h-12" src="https://tailwindui.com/img/logos/tuple-logo-gray-400.svg" alt="Tuple" />
+                                </div>
+                                <div className="mt-4 ml-8 flex flex-shrink-0 flex-grow justify-center lg:flex-grow-0">
+                                    <img className="h-12" src="https://tailwindui.com/img/logos/mirage-logo-gray-400.svg" alt="Mirage" />
+                                </div>
+                                <div className="mt-4 ml-8 flex flex-shrink-0 flex-grow justify-center lg:flex-grow-0">
+                                    <img className="h-12" src="https://tailwindui.com/img/logos/statickit-logo-gray-400.svg" alt="StaticKit" />
+                                </div>
+                                <div className="mt-4 ml-8 flex flex-shrink-0 flex-grow justify-center lg:flex-grow-0">
+                                    <img className="h-12" src="https://tailwindui.com/img/logos/transistor-logo-gray-400.svg" alt="Transistor" />
+                                </div>
+                                <div className="mt-4 ml-8 flex flex-shrink-0 flex-grow justify-center lg:flex-grow-0">
+                                    <img className="h-12" src="https://tailwindui.com/img/logos/workcation-logo-gray-400.svg" alt="Workcation" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
             
-            {/* Modal for Full Content */}
             {selectedPost && <StoryModal post={selectedPost} onClose={closeModal} />}
         </div>
     );
 };
 
 export default HomePage;
+
