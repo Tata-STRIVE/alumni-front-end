@@ -11,8 +11,8 @@ import {
 } from '../../services/apiService';
 import toast from 'react-hot-toast';
 import ApplicantsModal from './ApplicantsModal';
-import AdminJobReviewModal from './AdminJobReviewModal'; // Import review modal
-import apiClient from '../../services/apiService'; // Import apiClient for base URL
+import AdminJobReviewModal from './AdminJobReviewModal';
+import apiClient from '../../services/apiService';
 
 /**
  * Helper function to build the full, absolute URL for a file.
@@ -22,14 +22,12 @@ const buildFileUrl = (relativePath) => {
     if (relativePath.startsWith('http://') || relativePath.startsWith('https://')) {
         return relativePath;
     }
-    // Assumes apiClient.defaults.baseURL is 'http://localhost:8080/api'
     const baseUrl = apiClient.defaults.baseURL.replace('/api', '');
     return `${baseUrl}${relativePath}`;
 };
 
-
 /**
- * A reusable form for Posting or Editing a job by an Admin.
+ * Reusable Form for Posting or Editing a Job by an Admin (2-column layout)
  */
 const JobForm = ({ existingJob, onSave, onCancel, isSaving }) => {
     const [title, setTitle] = useState('');
@@ -42,7 +40,7 @@ const JobForm = ({ existingJob, onSave, onCancel, isSaving }) => {
     const isEditMode = !!existingJob;
 
     useEffect(() => {
-        if (isEditMode) {
+        if (isEditMode && existingJob) {
             setTitle(existingJob.title || '');
             setCompanyName(existingJob.companyName || '');
             setLocation(existingJob.location || '');
@@ -59,12 +57,12 @@ const JobForm = ({ existingJob, onSave, onCancel, isSaving }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="p-4 bg-gray-50 rounded-lg border max-w-3xl mx-auto shadow">
-            <h3 className="text-xl font-semibold text-gray-800 mb-6">
+        <form onSubmit={handleSubmit} className="p-6 bg-white rounded-lg shadow-xl max-w-2xl mx-auto">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 {isEditMode ? 'Edit Job Opening' : 'Post a New Job Opening'}
             </h3>
-            <div className="space-y-4">
-                {/* Job Title */}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label htmlFor="title" className="block text-sm font-medium text-gray-700">Job Title</label>
                     <input
@@ -72,7 +70,7 @@ const JobForm = ({ existingJob, onSave, onCancel, isSaving }) => {
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                     />
                 </div>
-                {/* Company Name */}
+
                 <div>
                     <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">Company Name</label>
                     <input
@@ -80,67 +78,68 @@ const JobForm = ({ existingJob, onSave, onCancel, isSaving }) => {
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                     />
                 </div>
-                {/* Location */}
+
                 <div>
-                    <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location (e.g., City, State)</label>
+                    <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
                     <input
                         type="text" id="location" value={location} onChange={(e) => setLocation(e.target.value)} required
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                     />
                 </div>
-                
-                {/* HR Contact Email */}
+
                 <div>
-                    <label htmlFor="hrContactEmail" className="block text-sm font-medium text-gray-700">HR Contact Email <span className="text-red-500">*</span></label>
+                    <label htmlFor="hrContactEmail" className="block text-sm font-medium text-gray-700">
+                        HR Contact Email <span className="text-red-500">*</span>
+                    </label>
                     <input
                         type="email" id="hrContactEmail" value={hrContactEmail} onChange={(e) => setHrContactEmail(e.target.value)} required
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                     />
                 </div>
-                {/* HR Contact Phone */}
+
                 <div>
-                    <label htmlFor="hrContactPhone" className="block text-sm font-medium text-gray-700">HR Contact Phone <span className="text-red-500">*</span></label>
+                    <label htmlFor="hrContactPhone" className="block text-sm font-medium text-gray-700">
+                        HR Contact Phone <span className="text-red-500">*</span>
+                    </label>
                     <input
                         type="tel" id="hrContactPhone" value={hrContactPhone} onChange={(e) => setHrContactPhone(e.target.value)} required
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                     />
                 </div>
-                
-                {/* Description */}
-                <div>
+
+                <div className="md:col-span-2">
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700">Job Description</label>
                     <textarea
-                        id="description" rows="6" value={description} onChange={(e) => setDescription(e.target.value)} required
+                        id="description" rows="4" value={description} onChange={(e) => setDescription(e.target.value)} required
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                     ></textarea>
                 </div>
-                {/* Buttons */}
-                <div className="text-right pt-2 flex justify-end space-x-3">
-                    {onCancel && (
-                        <button
-                            type="button"
-                            onClick={onCancel}
-                            className="inline-flex justify-center py-2 px-6 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                            Cancel
-                        </button>
-                    )}
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4">
+                {onCancel && (
                     <button
-                        type="submit"
-                        disabled={isSaving}
-                        className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-strive-blue hover:bg-opacity-90 disabled:bg-gray-400"
+                        type="button"
+                        onClick={onCancel}
+                        className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300"
                     >
-                        {isSaving ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Post Job')}
+                        Cancel
                     </button>
-                </div>
+                )}
+                <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-strive-blue text-white text-sm font-medium rounded-md hover:bg-opacity-90 disabled:bg-gray-400"
+                >
+                    {isSaving ? 'Saving...' : isEditMode ? 'Save Changes' : 'Post Job'}
+                </button>
             </div>
         </form>
     );
 };
 
-
 /**
- * The main Job Management Hub component.
+ * Main Job Management Component
  */
 const JobManagement = () => {
     const [activeTab, setActiveTab] = useState('manage');
@@ -150,26 +149,26 @@ const JobManagement = () => {
     const [error, setError] = useState('');
     const [isSaving, setIsSaving] = useState(false);
 
-    // Modal States
+    // Modals
     const [isApplicantsModalOpen, setIsApplicantsModalOpen] = useState(false);
-    const [selectedJob, setSelectedJob] = useState(null); // For View Applicants
+    const [selectedJob, setSelectedJob] = useState(null);
     const [applicants, setApplicants] = useState([]);
     const [modalLoading, setModalLoading] = useState(false);
 
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-    const [selectedReviewJob, setSelectedReviewJob] = useState(null); // For Review
+    const [selectedReviewJob, setSelectedReviewJob] = useState(null);
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedEditJob, setSelectedEditJob] = useState(null); // For Edit
+    const [selectedEditJob, setSelectedEditJob] = useState(null);
 
+    // Fetch Data
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError('');
         try {
-            // Use the new status-based admin endpoints
             const [jobsRes, pendingJobsRes] = await Promise.all([
-                getJobs(), // Fetches ACTIVE jobs
-                getPendingJobs(), // Fetches PENDING_APPROVAL jobs
+                getJobs(),
+                getPendingJobs(),
             ]);
             setActiveJobs(jobsRes.data || []);
             setPendingJobs(pendingJobsRes.data || []);
@@ -202,16 +201,15 @@ const JobManagement = () => {
 
     const handleUpdateApplicantStatus = async (applicationId, newStatus) => {
         try {
-            console.log('Updating applicant status:==>>>', applicationId, newStatus);
             await updateJobApplicationStatus(applicationId, { status: newStatus });
-                        console.log('Updating applicant status : updateJobApplicationStatus==>>>', applicationId, newStatus);
-
-            setApplicants(prev => prev.map(app =>
-                app.applicationId === applicationId ? { ...app, status: newStatus } : app
-            ));
+            setApplicants((prev) =>
+                prev.map((app) =>
+                    app.applicationId === applicationId ? { ...app, status: newStatus } : app
+                )
+            );
             toast.success(`Applicant status updated to ${newStatus}.`);
         } catch (err) {
-            toast.error('Failed to update applicant status.',err);
+            toast.error('Failed to update applicant status.');
         }
     };
 
@@ -222,7 +220,7 @@ const JobManagement = () => {
             toast.success(`Job ${reviewData.status.toLowerCase()} successfully.`);
             setIsReviewModalOpen(false);
             setSelectedReviewJob(null);
-            fetchData(); // Refresh lists
+            fetchData();
         } catch (err) {
             toast.error(err.response?.data?.error || 'Failed to submit review.');
         } finally {
@@ -235,8 +233,8 @@ const JobManagement = () => {
         try {
             await createJobByAdmin(jobData);
             toast.success('Job posted successfully!');
-            fetchData(); // Refresh lists
-            setActiveTab('manage'); // Switch to manage tab
+            fetchData();
+            setActiveTab('manage');
         } catch (err) {
             toast.error(err.response?.data?.error || 'Failed to post job.');
         } finally {
@@ -252,7 +250,7 @@ const JobManagement = () => {
             toast.success('Job updated successfully!');
             setIsEditModalOpen(false);
             setSelectedEditJob(null);
-            fetchData(); // Refresh lists
+            fetchData();
         } catch (err) {
             toast.error(err.response?.data?.error || 'Failed to update job.');
         } finally {
@@ -261,18 +259,26 @@ const JobManagement = () => {
     };
 
     const handleDeleteJob = async (job) => {
-        if (window.confirm(`Are you sure you want to delete the job: "${job.title}"? This action cannot be undone.`)) {
+        if (window.confirm(`Are you sure you want to delete "${job.title}"?`)) {
             try {
                 await deleteJob(job.jobId);
                 toast.success('Job deleted successfully.');
-                fetchData(); // Refresh lists
+                fetchData();
             } catch (err) {
                 toast.error(err.response?.data?.error || 'Failed to delete job.');
             }
         }
     };
 
-    // --- Render Logic ---
+    // --- Tabs ---
+    const getTabClassName = (tabName) => {
+        return `${activeTab === tabName
+            ? 'border-strive-blue text-strive-blue'
+            : 'border-transparent text-gray-500 hover:text-gray-700'
+            } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm`;
+    };
+
+    // --- Table Render ---
     const renderSubContent = () => {
         if (loading) return <div className="p-8 text-center text-gray-500">Loading job data...</div>;
         if (error) return <div className="p-4 bg-red-100 text-red-700 rounded-md">{error}</div>;
@@ -280,86 +286,96 @@ const JobManagement = () => {
         switch (activeTab) {
             case 'manage':
                 return (
-                    <table className="w-full text-sm text-left text-gray-500">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3">Job Title / Company</th>
-                                <th scope="col" className="px-6 py-3">HR Contact</th>
-                                <th scope="col" className="px-6 py-3">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {activeJobs.length > 0 ? activeJobs.map(job => (
-                                <tr key={job.jobId} className="bg-white border-b hover:bg-gray-50">
-                                    <td className="px-6 py-4">
-                                        <div className="font-medium text-gray-900">{job.title}</div>
-                                        <div className="text-sm text-gray-500">{job.companyName} - {job.location}</div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="font-medium text-gray-900">{job.hrContactEmail}</div>
-                                        <div className="text-sm text-gray-500">{job.hrContactPhone}</div>
-                                    </td>
-                                    <td className="px-6 py-4 space-x-2 whitespace-nowrap">
-                                        <button onClick={() => handleViewApplicants(job)} className="text-strive-blue hover:underline text-xs font-semibold">Applicants</button>
-                                        <button onClick={() => { setSelectedEditJob(job); setIsEditModalOpen(true); }} className="text-strive-orange hover:underline text-xs font-semibold">Edit</button>
-                                        <button onClick={() => handleDeleteJob(job)} className="text-red-600 hover:underline text-xs font-semibold">Delete</button>
-                                    </td>
+                    <div className="overflow-x-auto bg-white shadow rounded-lg">
+                        <table className="w-full table-fixed text-sm text-left text-gray-600">
+                            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th className="w-1/3 px-6 py-3 font-semibold">Job Title / Company</th>
+                                    <th className="w-1/3 px-6 py-3 font-semibold">HR Contact</th>
+                                    <th className="w-1/3 px-6 py-3 font-semibold text-center">Actions</th>
                                 </tr>
-                            )) : (
-                                <tr><td colSpan="3" className="text-center py-8 text-gray-500">No active jobs found.</td></tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {activeJobs.length > 0 ? (
+                                    activeJobs.map((job) => (
+                                        <tr key={job.jobId} className="bg-white border-b hover:bg-gray-50">
+                                            <td className="px-6 py-4 align-top">
+                                                <div className="font-medium text-gray-900">{job.title}</div>
+                                                <div className="text-sm text-gray-500">{job.companyName} — {job.location}</div>
+                                            </td>
+                                            <td className="px-6 py-4 align-top">
+                                                <div className="font-medium text-gray-900">{job.hrContactEmail}</div>
+                                                <div className="text-sm text-gray-500">{job.hrContactPhone}</div>
+                                            </td>
+                                            <td className="px-6 py-4 align-top text-center">
+                                                <button onClick={() => handleViewApplicants(job)} className="text-strive-blue hover:underline text-xs font-semibold mx-2">Applicants</button>
+                                                <button onClick={() => { setSelectedEditJob(job); setIsEditModalOpen(true); }} className="text-strive-orange hover:underline text-xs font-semibold mx-2">Edit</button>
+                                                <button onClick={() => handleDeleteJob(job)} className="text-red-600 hover:underline text-xs font-semibold mx-2">Delete</button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr><td colSpan="3" className="text-center py-8 text-gray-500">No active jobs found.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 );
+
             case 'verify':
                 return (
-                    <table className="w-full text-sm text-left text-gray-500">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3">Job Title / Company</th>
-                                <th scope="col" className="px-6 py-3">Submitted By</th>
-                                <th scope="col" className="px-6 py-3">HR Contact</th>
-                                <th scope="col" className="px-6 py-3">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {pendingJobs.length > 0 ? pendingJobs.map(job => (
-                                <tr key={job.jobId} className="bg-white border-b hover:bg-gray-50">
-                                    <td className="px-6 py-4">
-                                        <div className="font-semibold text-gray-900">{job.title}</div>
-                                        <div className="text-sm text-gray-500">{job.companyName}</div>
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-600">{job.authorName}</td>
-                                    <td className="px-6 py-4">
-                                        <div className="font-medium text-gray-900">{job.hrContactEmail}</div>
-                                        <div className="text-sm text-gray-500">{job.hrContactPhone}</div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <button onClick={() => { setSelectedReviewJob(job); setIsReviewModalOpen(true); }} className="bg-strive-blue text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-opacity-90">
-                                            Review
-                                        </button>
-                                    </td>
+                    <div className="overflow-x-auto bg-white shadow rounded-lg">
+                        <table className="w-full table-fixed text-sm text-left text-gray-600">
+                            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th className="w-1/4 px-6 py-3 font-semibold">Job Title / Company</th>
+                                    <th className="w-1/4 px-6 py-3 font-semibold">Submitted By</th>
+                                    <th className="w-1/4 px-6 py-3 font-semibold">HR Contact</th>
+                                    <th className="w-1/4 px-6 py-3 font-semibold text-center">Action</th>
                                 </tr>
-                            )) : (
-                                <tr><td colSpan="4" className="text-center py-8 text-gray-500">No jobs are pending verification.</td></tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {pendingJobs.length > 0 ? (
+                                    pendingJobs.map((job) => (
+                                        <tr key={job.jobId} className="bg-white border-b hover:bg-gray-50">
+                                            <td className="px-6 py-4 align-top">
+                                                <div className="font-semibold text-gray-900">{job.title}</div>
+                                                <div className="text-sm text-gray-500">{job.companyName} — {job.location}</div>
+                                            </td>
+                                            <td className="px-6 py-4 align-top text-gray-700">{job.authorName || <span className="italic text-gray-400">Unknown</span>}</td>
+                                            <td className="px-6 py-4 align-top">
+                                                <div className="font-medium text-gray-900">{job.hrContactEmail}</div>
+                                                <div className="text-sm text-gray-500">{job.hrContactPhone}</div>
+                                            </td>
+                                            <td className="px-6 py-4 align-top text-center">
+                                                <button
+                                                    onClick={() => { setSelectedReviewJob(job); setIsReviewModalOpen(true); }}
+                                                    className="bg-strive-blue text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-opacity-90"
+                                                >
+                                                    Review
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr><td colSpan="4" className="text-center py-8 text-gray-500">No jobs are pending verification.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 );
+
             case 'post':
                 return <JobForm onSave={handlePostJob} isSaving={isSaving} />;
+
             default:
                 return null;
         }
     };
 
-    const getTabClassName = (tabName) => {
-        return `${activeTab === tabName ? 'border-strive-blue text-strive-blue' : 'border-transparent text-gray-500 hover:text-gray-700'} whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm`;
-    };
-
+    // --- Render ---
     return (
         <div>
-            {/* Sub-navigation */}
             <div className="mb-6 border-b border-gray-300">
                 <nav className="-mb-px flex space-x-6 overflow-x-auto" aria-label="Job Tabs">
                     <button onClick={() => setActiveTab('manage')} className={getTabClassName('manage')}>Manage Jobs</button>
@@ -370,7 +386,6 @@ const JobManagement = () => {
 
             {renderSubContent()}
 
-            {/* Modal for viewing applicants */}
             {isApplicantsModalOpen && (
                 <ApplicantsModal
                     job={selectedJob}
@@ -381,7 +396,6 @@ const JobManagement = () => {
                 />
             )}
 
-            {/* Modal for reviewing alumni jobs */}
             {isReviewModalOpen && (
                 <AdminJobReviewModal
                     job={selectedReviewJob}
@@ -391,10 +405,9 @@ const JobManagement = () => {
                 />
             )}
 
-            {/* Modal for editing an existing job */}
             {isEditModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-                    <div className="bg-white rounded-lg shadow-xl max-w-xl">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
                         <JobForm
                             existingJob={selectedEditJob}
                             onSave={handleEditJob}
@@ -409,4 +422,3 @@ const JobManagement = () => {
 };
 
 export default JobManagement;
-

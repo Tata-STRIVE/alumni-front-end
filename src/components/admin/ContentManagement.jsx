@@ -270,7 +270,7 @@ const ContentPostForm = ({
                                 onChange={(e) => setAlumnusUserId(e.target.value)}
                                 required 
                                 className={`${inputStyles} ${isEditMode ? 'bg-gray-100' : ''}`}
-                                disabled={isEditMode} // FIX: Disable, but value is now handled in handleSubmit
+                               // disabled={isEditMode} // FIX: Disable, but value is now handled in handleSubmit
                             >
                                 <option value="">Select an Alumnus (Required)</option> 
                                 {alumnusUsers.map(user => (

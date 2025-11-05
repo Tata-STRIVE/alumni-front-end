@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 
 /**
- * PostJobModal — A modal form for alumni to submit a job opportunity for admin verification.
- * Uses a React Portal to render above all page content.
+ * EditJobModal — Admin/Alumnus modal for editing an existing job posting.
+ * Reuses the same design as PostJobModal for consistency.
  */
-const PostJobModal = ({ onClose, onSubmit }) => {
-  // --- Local state for form fields ---
+const EditJobModal = ({ existingJob, onClose, onSave }) => {
   const [title, setTitle] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [location, setLocation] = useState("");
@@ -16,14 +15,20 @@ const PostJobModal = ({ onClose, onSubmit }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log("✅ PostJobModal mounted via Portal.");
-  }, []);
+    if (existingJob) {
+      setTitle(existingJob.title || "");
+      setCompanyName(existingJob.companyName || "");
+      setLocation(existingJob.location || "");
+      setDescription(existingJob.description || "");
+      setHrContactEmail(existingJob.hrContactEmail || "");
+      setHrContactPhone(existingJob.hrContactPhone || "");
+    }
+  }, [existingJob]);
 
-  // --- Submit handler ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const jobData = {
+    const updatedJob = {
       title,
       companyName,
       location,
@@ -31,19 +36,16 @@ const PostJobModal = ({ onClose, onSubmit }) => {
       hrContactEmail,
       hrContactPhone,
     };
-    await onSubmit(jobData);
+    await onSave(existingJob.jobId, updatedJob);
     setLoading(false);
   };
 
-  // --- Modal Content ---
   const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
         {/* Header */}
         <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Post a Job Opportunity
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-800">Edit Job</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-800"
@@ -56,7 +58,6 @@ const PostJobModal = ({ onClose, onSubmit }) => {
         {/* Form Section */}
         <form onSubmit={handleSubmit}>
           <div className="p-6">
-            {/* Responsive two-column grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Job Title */}
               <div>
@@ -100,7 +101,7 @@ const PostJobModal = ({ onClose, onSubmit }) => {
                   htmlFor="location"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Location (e.g., City, State)
+                  Location
                 </label>
                 <input
                   type="text"
@@ -148,7 +149,7 @@ const PostJobModal = ({ onClose, onSubmit }) => {
                 />
               </div>
 
-              {/* Description (spans both columns) */}
+              {/* Job Description */}
               <div className="md:col-span-2">
                 <label
                   htmlFor="description"
@@ -168,7 +169,7 @@ const PostJobModal = ({ onClose, onSubmit }) => {
             </div>
           </div>
 
-          {/* Footer Buttons */}
+          {/* Footer */}
           <div className="p-4 bg-gray-50 border-t flex justify-end space-x-3">
             <button
               type="button"
@@ -182,7 +183,7 @@ const PostJobModal = ({ onClose, onSubmit }) => {
               disabled={loading}
               className="px-4 py-2 bg-strive-blue text-white text-sm font-medium rounded-md hover:bg-opacity-90 disabled:bg-gray-400"
             >
-              {loading ? "Submitting..." : "Submit for Verification"}
+              {loading ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>
@@ -190,8 +191,7 @@ const PostJobModal = ({ onClose, onSubmit }) => {
     </div>
   );
 
-  // --- Render modal into #modal-root using React Portal ---
   return ReactDOM.createPortal(modalContent, document.getElementById("modal-root"));
 };
 
-export default PostJobModal;
+export default EditJobModal;

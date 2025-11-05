@@ -131,7 +131,7 @@ export const getCenters = () => {
 };
 export const getBatches = (lang = 'en') => {
     const tenantId = getTenantIdFromUrl();
-    return apiClient.get(`/batches?lang=${lang}&tenantId/${tenantId}`);
+    return apiClient.get(`/batches?lang=${lang}&tenantId=${tenantId}`);
 };
 export const getBatchesForCourse = (courseId, lang = 'en') => {
     const tenantId = getTenantIdFromUrl();
