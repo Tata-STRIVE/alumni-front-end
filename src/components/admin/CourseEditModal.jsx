@@ -20,23 +20,38 @@ const CourseEditModal = ({ onClose, onCourseSaved, existingCourse }) => {
     });
 
     // Effect to pre-fill the form when editing an existing course
-    useEffect(() => {
-        if (existingCourse && existingCourse.translations) {
-            const initialTranslations = { ...translations };
-            existingCourse.translations.forEach(t => {
-                const langCode = t.languageCode.toLowerCase();
-                if (initialTranslations[langCode]) {
-                    initialTranslations[langCode] = {
-                        name: t.name || '',
-                        description: t.description || '',
-                        eligibilityCriteria: t.eligibilityCriteria || '',
-                        careerPath: t.careerPath || '',
-                    };
-                }
-            });
-            setTranslations(initialTranslations);
+   useEffect(() => {
+  if (existingCourse) {
+    const initialTranslations = { ...translations };
+
+    if (existingCourse.translations && existingCourse.translations.length > 0) {
+      // --- Normal case when backend sends translations array ---
+      existingCourse.translations.forEach(t => {
+        const langCode = t.languageCode?.toLowerCase();
+        if (initialTranslations[langCode]) {
+          initialTranslations[langCode] = {
+            name: t.name || '',
+            description: t.description || '',
+            eligibilityCriteria: t.eligibilityCriteria || '',
+            careerPath: t.careerPath || '',
+          };
         }
-    }, [existingCourse]);
+      });
+    } else {
+      // --- Fallback for when editing course list without translations ---
+      initialTranslations.en = {
+        name: existingCourse.name || '',
+        description: existingCourse.description || '',
+        eligibilityCriteria: existingCourse.eligibilityCriteria || '',
+        careerPath: existingCourse.careerPath || '',
+      };
+    }
+
+    setIconUrl(existingCourse.iconUrl || '');
+    setTranslations(initialTranslations);
+  }
+}, [existingCourse]);
+
 
     // Handle form field changes for the currently active language
     const handleLangChange = (e) => {

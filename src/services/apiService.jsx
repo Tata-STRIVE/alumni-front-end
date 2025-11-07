@@ -156,8 +156,12 @@ export const getPendingEmploymentHistory = () => apiClient.get('/employment-hist
 export const getTotalAlumniCount = () => apiClient.get('/users/count');
 export const createUpskillingOpportunity = (oppData) => apiClient.post('/upskilling', oppData);
 export const getUpskillingApplications = (oppId) => apiClient.get(`/upskilling/${oppId}/applications`);
-export const updateUpskillingApplicationStatus = (appId, status) => apiClient.put(`/upskilling/applications/${appId}`, { status });
-
+export const updateUpskillingApplicationStatus = (appId, status) => apiClient.put(`/upskilling/applications/${appId}`,  status );
+// export const getUpskillingOpportunities = () => apiClient.get('/upskilling/tenantId/STRIVE');
+// ✅ Add this missing one
+export const updateUpskillingOpportunity = (id, data) => apiClient.put(`/upskilling/${id}`, data);
+// Delete opportunity
+export const deleteUpskillingOpportunity = (id) =>  apiClient.delete(`/upskilling/${id}`);
 // Admin Content, Course, Batch Management
 export const createContentPost = (postData) => apiClient.post('/content', postData);
 export const createCourse = (courseData) => apiClient.post('/courses', courseData);

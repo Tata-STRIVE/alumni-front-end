@@ -10,6 +10,7 @@ import StatCard from '../components/admin/StatCard';
 import ContentManagement from '../components/admin/ContentManagement';
 import AdminHistoryReviewModal from '../components/admin/AdminHistoryReviewModal';
 import JobManagement from '../components/admin/JobManagement'; // --- 1. IMPORT THE NEW HUB ---
+import UpskillingManagement from '../components/admin/UpskillingManagement';
 import toast from 'react-hot-toast'; 
 
 const AdminDashboard = ({ role }) => {
@@ -148,6 +149,10 @@ const AdminDashboard = ({ role }) => {
                 return <JobManagement />;
             case 'content_management':
                 return <ContentManagement />;
+                case 'upskilling':
+  return <UpskillingManagement />;
+
+  
             default:
                 return null;
         }
@@ -173,6 +178,8 @@ const AdminDashboard = ({ role }) => {
                             <button onClick={() => setActiveTab('employment_verification')} className={`${activeTab === 'employment_verification' ? 'border-strive-blue text-strive-blue' : 'border-transparent text-gray-500 hover:text-gray-700'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>History Verifications</button>
                             <button onClick={() => setActiveTab('jobs')} className={`${activeTab === 'jobs' ? 'border-strive-blue text-strive-blue' : 'border-transparent text-gray-500 hover:text-gray-700'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>Job Management</button>
                             <button onClick={() => setActiveTab('content_management')} className={`${activeTab === 'content_management' ? 'border-strive-blue text-strive-blue' : 'border-transparent text-gray-500 hover:text-gray-700'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>Content Management</button>
+                            <button onClick={() => setActiveTab('upskilling')}  className={`${activeTab === 'upskilling'  ? 'border-strive-blue text-strive-blue'  : 'border-transparent text-gray-500 hover:text-gray-700'}     whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`} > Upskilling Management </button>
+
                         </nav>
                     </div>
                     <div className="p-6">

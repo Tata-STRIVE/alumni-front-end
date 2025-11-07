@@ -44,7 +44,7 @@ const BatchEditModal = ({ onClose, onBatchSaved, existingBatch, courses = [], ce
         try {
             if (isEditMode) {
                 await updateBatch(existingBatch.batchId, batchData);
-                toast.success('Batch updated successfully!', { id: toastId });
+                toast.success('Batch updated successfully!', { id:  toastId });
             } else {
                 await createBatch(batchData);
                 toast.success('New Batch created successfully!', { id: toastId });
