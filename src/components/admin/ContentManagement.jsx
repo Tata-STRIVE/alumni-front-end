@@ -22,6 +22,8 @@ import toast from 'react-hot-toast';
 import DatePicker from 'react-datepicker'; 
 import 'react-datepicker/dist/react-datepicker.css'; 
 import { buildFileUrl } from '../../utils/fileUrl'; // --- IMPORT NEW HELPER ---
+import { useAuth } from "../../context/AuthContext";
+
 
 // --- Sub-Component for Displaying Existing Posts ---
 const ContentPostsList = ({ postType, posts, loading, error, onEdit, onDelete }) => {
@@ -371,6 +373,9 @@ const ContentPostForm = ({
  * The main hub component for managing tenant-specific content.
  */
 const ContentManagement = () => {
+
+      const { isAdmin, user } = useAuth();
+  console.log("Current Role:", user?.role, "Is Admin:", isAdmin);
     const { t, i18n } = useTranslation();
     const [activeTab, setActiveTab] = useState('stories'); 
 
@@ -392,7 +397,7 @@ const ContentManagement = () => {
     const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
     const [editingCourse, setEditingCourse] = useState(null);
     const [editingBatch, setEditingBatch] = useState(null);
-
+    const userRole = localStorage.getItem("role"); 
     // --- State for editing content posts ---
     const [editingPost, setEditingPost] = useState(null);
     
@@ -400,8 +405,9 @@ const ContentManagement = () => {
     const loadMasterData = useCallback(async () => {
         setLoadingMasterData(true);
         try {
+            console.log("Loading content master data..." , isAdmin);
             const [coursesRes, batchesRes, centersRes, alumnusRes] = await Promise.all([
-                getCourses(i18n.language),
+                getCourses(i18n.language, isAdmin),
                 getBatches(i18n.language),
                 getCenters(),
                 getAlumnusUsers() 
@@ -502,6 +508,26 @@ const ContentManagement = () => {
       }`;
     };
 
+
+    const getCourseDisplayName = (course) => {
+  if (!course?.translations || course.translations.length === 0) return "Unnamed Course";
+
+  const currentLang = i18n.language?.toLowerCase() || "en";
+
+  // Find translation matching current UI language
+  const translation = course.translations.find(
+    (t) => t.languageCode?.toLowerCase() === currentLang
+  );
+
+  // Fallback: English or first translation
+  return (
+    translation?.name ||
+    course.translations.find((t) => t.languageCode?.toLowerCase() === "en")?.name ||
+    course.translations[0]?.name ||
+    "Unnamed Course"
+  );
+};
+
     const renderSubContent = () => {
         const loading = loadingMasterData || loadingPosts;
 
@@ -524,7 +550,8 @@ const ContentManagement = () => {
                         <div className="space-y-4">
                             {courses.map(course => (
                                 <div key={course.courseId} className="p-4 bg-white rounded-md border shadow-sm flex justify-between items-center">
-                                    <h3 className="font-semibold text-lg text-strive-blue">{course.name}</h3>
+                                  <h3 className="font-semibold text-lg text-strive-blue">{getCourseDisplayName(course)}
+</h3>
                                     <button onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }} className={editButton}>Edit</button>
                                 </div>
                             ))}

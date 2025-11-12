@@ -57,7 +57,6 @@ export const AuthProvider = ({ children }) => {
             console.log("AuthContext: User state updated and token stored successfully.");
         } catch (error) {
             console.error("AuthContext: CRITICAL - Failed to decode new JWT during login!", error);
-            // This is a critical error. The token from the backend might be malformed.
         }
     };
 
@@ -67,12 +66,18 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
     };
 
+    // ✅ Derived flags — automatically computed based on role
+    const isAdmin = user && ["CENTER_ADMIN", "SUPER_ADMIN", "PLATFORM_ADMIN"].includes(user.role);
+    const isAlumnus = user && user.role === "ALUMNUS";
+
     const authContextValue = {
         user,
         token,
         loading,
         login,
         logout,
+        isAdmin,   // ✅ added
+        isAlumnus, // ✅ added (optional but useful)
     };
 
     return (
@@ -85,4 +90,3 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
     return useContext(AuthContext);
 };
-

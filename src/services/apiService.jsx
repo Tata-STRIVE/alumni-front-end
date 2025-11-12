@@ -121,10 +121,20 @@ export const getContentPosts = (type) => {
 };
 
 // --- MASTER DATA API CALLS (Public Access) ---
-export const getCourses = (lang = 'en') => {
-    const tenantId = getTenantIdFromUrl();
-    return apiClient.get(`/courses?lang=${lang}&tenantId=${tenantId}`);
+
+
+export const getCourses = async (lang = 'en', isAdmin = false) => {
+  const tenantId = localStorage.getItem("tenantId") || getTenantIdFromUrl();
+  const url = `/courses?tenantId=${tenantId}&lang=${lang}&adminView=${isAdmin}`;
+  return apiClient.get(url);
 };
+
+export const getCourseById = (id) => apiClient.get(`/courses/${id}`); // ✅ ADD THIS LINE
+
+export const createCourse = (courseData) => apiClient.post('/courses', courseData);
+export const updateCourse = (courseId, courseData) => apiClient.put(`/courses/${courseId}`, courseData);
+export const deleteCourse = (courseId) => apiClient.delete(`/courses/${courseId}`);
+
 export const getCenters = () => {
     const tenantId = getTenantIdFromUrl();
     return apiClient.get(`/centers/tenantId/${tenantId}`);
@@ -164,12 +174,14 @@ export const updateUpskillingOpportunity = (id, data) => apiClient.put(`/upskill
 export const deleteUpskillingOpportunity = (id) =>  apiClient.delete(`/upskilling/${id}`);
 // Admin Content, Course, Batch Management
 export const createContentPost = (postData) => apiClient.post('/content', postData);
-export const createCourse = (courseData) => apiClient.post('/courses', courseData);
-export const updateCourse = (courseId, courseData) => apiClient.put(`/courses/${courseId}`, courseData);
+// export const createCourse = (courseData) => apiClient.post('/courses', courseData);
+// export const updateCourse = (courseId, courseData) => apiClient.put(`/courses/${courseId}`, courseData);
 export const createBatch = (batchData) => apiClient.post('/batches', batchData);
 export const updateBatch = (batchId, batchData) => apiClient.put(`/batches/${batchId}`, batchData);
 export const updateContentPost = (postId, postData) => apiClient.put(`/content/${postId}`, postData);
 export const deleteContentPost = (postId) => apiClient.delete(`/content/${postId}`);
+export const getAllCoursesForAdmin = (tenantId) =>   api.get(`/courses/admin?tenantId=${tenantId}`);
+
 
 
 export default apiClient;
